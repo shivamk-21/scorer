@@ -1,5 +1,5 @@
 #Imports
-import customtkinter
+import customtkinter,tkinter
 from functools import partial
 #App Definition
 app = customtkinter.CTk()
@@ -17,7 +17,15 @@ def round(n):
     if rounds_frame.winfo_ismapped():
         rounds_frame.forget()
     rounds_frame.pack(side='right',fill='both',padx=20,pady=20)
-    print(n)
+    def details():
+        dialog1 = customtkinter.CTkInputDialog(text="Number of Teams:", title="Teams")
+        no_teams=int(dialog1.get_input())
+        dialog2 = customtkinter.CTkInputDialog(text="Score System (R/W/P/PW):", title="Score")
+        scores=list(map(int,dialog2.get_input().split("/")))
+        detBtn.place_forget()
+        print(no_teams,scores)
+    detBtn = customtkinter.CTkButton(app, text="Add Round Details", command=details)
+    detBtn.place(relx=0.6, rely=0.1, anchor=tkinter.CENTER)
 def add_rounds(event=None):
     for x in sidebar_frame.winfo_children()[1:]:
         x.destroy()
