@@ -12,11 +12,13 @@ customtkinter.set_default_color_theme("blue")
 #Varibales
 
 #Functions
-#Function to Save the scoers in upper Tab
+#Function to Save the scores in upper Tab
 def save_master(score):
     s=" ".join(["Team "+str(x+1)+" : "+str(score[x]) for x in range(len(score))])
+    scores_textbox.configure(state="normal")
     scores_textbox.delete(0,'end')
     scores_textbox.insert(0,s)
+    scores_textbox.configure(state="readonly")
 #Function which designs the Round's Frame
 def set_round(no_teams,scores,iniScores):
     segment_buttons=[] #List of all segment buttons
@@ -54,9 +56,9 @@ def set_round(no_teams,scores,iniScores):
     #Creation of segment Buttons and addition in the segment_buttons list
     for team in range(no_teams):
         segment_buttons.append(customtkinter.CTkSegmentedButton(rounds_frame,values=scores,command=partial(add_points,team)))
-        segment_buttons[team].place(relx=0.5, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
+        segment_buttons[team].place(relx=0.6, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
         #Label for each Segment Button
-        customtkinter.CTkLabel(rounds_frame,text="Team "+str(team+1)).place(relx=0.3, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
+        customtkinter.CTkLabel(rounds_frame,text="Team "+str(team+1)).place(relx=0.4, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
     add_points(0,0)  #PseudoUpdating the ScoreaTab
 #Function to set Each Round Details
 def round_details():
@@ -84,37 +86,59 @@ def round_details():
     detBtn.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
 #Function to add Rounds in the SideBar 
 def add_rounds(event=None):
+    sidebar_subframe2.pack(pady=5,padx=5,fill='y',ipadx=5,ipady=5)  #Packing Frame when required
     #Removing Rounds if they exist
-    for x in sidebar_frame.winfo_children()[1:]:
+    for x in sidebar_subframe2.winfo_children():
         x.destroy()
     #Creating Buttons for Each Round
     n=int(sidebar_textbox.get())
     sidebar_textbox.delete(0,"end")
-    rounds=[customtkinter.CTkButton(sidebar_frame,text="Round"+str(x),width=width*.05,command=round_details) for x in range(1,n+1)]
+    rounds=[customtkinter.CTkButton(sidebar_subframe2,text="Round"+str(x),width=width*.05,command=round_details) for x in range(1,n+1)]
     #Packing all Round's Button in Sidebar
     for x in range(n):
         rounds[x].pack(pady=5)
+#Function to change Appearance
+def change_appearance_mode_event(new_appearance_mode):
+        customtkinter.set_appearance_mode(new_appearance_mode)
+#Function to change Scaling
+def change_scaling_event(new_scaling):
+        new_scaling_float = int(new_scaling.replace("%", "")) / 100
+        customtkinter.set_widget_scaling(new_scaling_float)
 #Elements
 sidebar_frame = customtkinter.CTkFrame(app)
-sidebar_subframe=customtkinter.CTkFrame(sidebar_frame)
+sidebar_subframe1=customtkinter.CTkFrame(sidebar_frame)
+sidebar_subframe2=customtkinter.CTkFrame(sidebar_frame)
+sidebar_subframe3=customtkinter.CTkFrame(sidebar_frame)
 scores_frame=customtkinter.CTkFrame(app,height=50,width=width*.8)
 rounds_frame=customtkinter.CTkFrame(app,width=width*.8)
 scores_label=customtkinter.CTkLabel(scores_frame,text="Saved Scores: ")
 scores_button=customtkinter.CTkButton(scores_frame,text="Save",width=width*.02)
-scores_textbox=customtkinter.CTkEntry(scores_frame,width=width*.47)
-sidebar_label=customtkinter.CTkLabel(sidebar_subframe,text="Enter No of Rounds:")
-sidebar_textbox=customtkinter.CTkEntry(sidebar_subframe,width=width*.04)
+scores_textbox=customtkinter.CTkEntry(scores_frame,width=width*.45,state='readonly')
+sidebar_label=customtkinter.CTkLabel(sidebar_subframe1,text="Enter No of Rounds:")
+sidebar_textbox=customtkinter.CTkEntry(sidebar_subframe1,width=width*.04)
 sidebar_textbox.bind("<Return>",add_rounds)
-sidebar_button=customtkinter.CTkButton(sidebar_subframe,text="Go",width=width*.02,command=add_rounds)
+sidebar_button=customtkinter.CTkButton(sidebar_subframe1,text="Go",width=width*.02,command=add_rounds)
+appearance_mode_label = customtkinter.CTkLabel(sidebar_subframe3, text="Appearance Mode:", anchor="w")
+appearance_mode_optionemenu = customtkinter.CTkOptionMenu(sidebar_subframe3, values=["Dark", "Light", "System"],
+                                                                       command=change_appearance_mode_event)
+scaling_label = customtkinter.CTkLabel(sidebar_subframe3, text="UI Scaling:", anchor="w")
+scaling_optionemenu = customtkinter.CTkOptionMenu(sidebar_subframe3, values=["50%","60%","80%", "90%", "100%", "110%", "120%"],
+                                                               command=change_scaling_event)
+scaling_optionemenu.set("100%")
 #Packing/Griding
 sidebar_frame.pack(side="left",fill="y",padx=10,pady=10,ipadx=5)
-sidebar_subframe.pack(pady=2,padx=2,ipadx=15,ipady=5)
+sidebar_subframe1.pack(pady=5,padx=5,ipadx=5,ipady=5)
+sidebar_subframe3.pack(side='bottom',pady=5,padx=5,ipadx=10)
 sidebar_label.pack(pady=10)
-sidebar_textbox.pack(side='left')
-sidebar_button.pack(side='right')
+sidebar_textbox.pack(side='left',padx=5,pady=5)
+sidebar_button.pack(side='right',padx=5,pady=5)
 scores_frame.pack(fill='y',padx=20,pady=20)
 scores_label.place(relx=0.05,rely=0.5, anchor=tkinter.CENTER)
 scores_button.place(relx=.97,rely=0.5, anchor=tkinter.CENTER)
 scores_textbox.place(relx=0.52,rely=0.5, anchor=tkinter.CENTER)
+scaling_optionemenu.pack(side='bottom')
+scaling_label.pack(side='bottom')
+appearance_mode_optionemenu.pack(side='bottom')
+appearance_mode_label.pack(side='bottom')
 #MainLoop
 app.mainloop()
