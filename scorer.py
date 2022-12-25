@@ -13,25 +13,32 @@ customtkinter.set_default_color_theme("blue")
 rounds=[]
 scores=[]
 #Functions
-def round(n):
+def set_round(no_teams,scores):
+    segment_buttons=[]
+    for team in range(no_teams):
+        segment_buttons.append(customtkinter.CTkSegmentedButton(rounds_frame,values=scores,command=print))
+        segment_buttons[team].place(relx=0.5, rely=(team+1)*.8/no_teams, anchor=tkinter.CENTER)
+def round_details(n):
     if rounds_frame.winfo_ismapped():
         rounds_frame.forget()
+        for x in rounds_frame.winfo_children():
+            x.place_forget()
     rounds_frame.pack(side='right',fill='both',padx=20,pady=20)
     def details():
         dialog1 = customtkinter.CTkInputDialog(text="Number of Teams:", title="Teams")
         no_teams=int(dialog1.get_input())
-        dialog2 = customtkinter.CTkInputDialog(text="Score System (R/W/P/PW):", title="Score")
+        dialog2 = customtkinter.CTkInputDialog(text="Score System ('/' seperated):", title="Scores")
         scores=list(map(int,dialog2.get_input().split("/")))
         detBtn.place_forget()
-        print(no_teams,scores)
-    detBtn = customtkinter.CTkButton(app, text="Add Round Details", command=details)
-    detBtn.place(relx=0.6, rely=0.1, anchor=tkinter.CENTER)
+        set_round(no_teams,scores)
+    detBtn = customtkinter.CTkButton(rounds_frame, text="Add Round Details", command=details)
+    detBtn.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
 def add_rounds(event=None):
     for x in sidebar_frame.winfo_children()[1:]:
         x.destroy()
     n=int(sidebar_textbox.get())
     sidebar_textbox.delete(0,"end")
-    rounds=[customtkinter.CTkButton(sidebar_frame,text="Round"+str(x),width=width*.05,command=partial(round,x)) for x in range(1,n+1)]
+    rounds=[customtkinter.CTkButton(sidebar_frame,text="Round"+str(x),width=width*.05,command=partial(round_details,x)) for x in range(1,n+1)]
     for x in range(n):
         rounds[x].pack(pady=5)
 #Elements
