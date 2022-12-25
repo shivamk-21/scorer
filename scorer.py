@@ -11,13 +11,38 @@ customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("blue")
 #Varibales
 rounds=[]
-scores=[]
+master_team_scores=[]
 #Functions
 def set_round(no_teams,scores):
     segment_buttons=[]
+    team_scores=[0]*no_teams
+    scoreTab=customtkinter.CTkEntry(rounds_frame,state='readonly',width=width*.4)
+    scoreTab.place(relx=0.4,rely=.95,anchor=tkinter.CENTER)
+    switch_var = customtkinter.StringVar(value="on")
+    def switch_event():
+        if switch_var.get()=="off":
+            scoreTab.configure(state="normal")
+        else:
+            s=scoreTab.get().split(":")
+            s=[int(x.split()[0]) for x in s[1:]]
+            for x in range(len(s)):
+                team_scores[x]=s[x]
+            scoreTab.configure(state="readonly")
+    switch = customtkinter.CTkSwitch(rounds_frame, text="Admin LOCK", command=switch_event,variable=switch_var, onvalue="on", offvalue="off")
+    switch.place(relx=0.9,rely=.95,anchor=tkinter.CENTER)
+    def add_points(team_no,val):
+        team_scores[team_no]+=val
+        scoreTab.configure(state="normal")
+        s=" ".join(["Team "+str(x+1)+" : "+str(team_scores[x]) for x in range(len(team_scores))])
+        scoreTab.delete(0,'end')
+        scoreTab.insert(0,s)
+        scoreTab.configure(state="readonly")
+        segment_buttons[team_no].set("unset")
     for team in range(no_teams):
-        segment_buttons.append(customtkinter.CTkSegmentedButton(rounds_frame,values=scores,command=print))
-        segment_buttons[team].place(relx=0.5, rely=(team+1)*.8/no_teams, anchor=tkinter.CENTER)
+        segment_buttons.append(customtkinter.CTkSegmentedButton(rounds_frame,values=scores,command=partial(add_points,team)))
+        segment_buttons[team].place(relx=0.5, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
+        customtkinter.CTkLabel(rounds_frame,text="Team "+str(team+1)).place(relx=0.3, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
+    
 def round_details(n):
     if rounds_frame.winfo_ismapped():
         rounds_frame.forget()
