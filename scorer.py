@@ -4,7 +4,7 @@ from functools import partial
 #App Definition
 app = customtkinter.CTk()
 app.state("zoomed")
-app.title("CTk example")
+app.title("Inquizitive_Scoring_App")
 width=app.winfo_width()
 height=app.winfo_height()
 customtkinter.set_appearance_mode("System")
@@ -12,11 +12,21 @@ customtkinter.set_default_color_theme("blue")
 #Varibales
 
 #Functions
+#Function to Save the scoers in upper Tab
+def save_master(score):
+    s=" ".join(["Team "+str(x+1)+" : "+str(score[x]) for x in range(len(score))])
+    scores_textbox.delete(0,'end')
+    scores_textbox.insert(0,s)
 #Function which designs the Round's Frame
 def set_round(no_teams,scores,iniScores):
     segment_buttons=[] #List of all segment buttons
     switch_var = customtkinter.StringVar(value="on") #Variable for the Switch
+    if iniScores==['']:  #If Initial scores were left blank for setting all scores zero
+        iniScores=[0]*no_teams
+    else:              #Converting Values to Integer
+        iniScores=list(map(int,iniScores))
     team_scores=iniScores  #Initial Scores of teams
+    scores_button.configure(command=partial(save_master,team_scores)) #Adding functionality to Save Button
     #Subfunction which add functionality to Switch 
     def switch_event():
         if switch_var.get()=="off":
@@ -47,6 +57,7 @@ def set_round(no_teams,scores,iniScores):
         segment_buttons[team].place(relx=0.5, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
         #Label for each Segment Button
         customtkinter.CTkLabel(rounds_frame,text="Team "+str(team+1)).place(relx=0.3, rely=.05+(team+1)*.8/no_teams, anchor=tkinter.CENTER)
+    add_points(0,0)  #PseudoUpdating the ScoreaTab
 #Function to set Each Round Details
 def round_details():
     #Removing Elements of Previous Round if they Exist
@@ -61,10 +72,10 @@ def round_details():
         #Taking Relevant Details
         dialog1 = customtkinter.CTkInputDialog(text="Number of Teams:", title="Teams")
         no_teams=int(dialog1.get_input())
-        dialog2 = customtkinter.CTkInputDialog(text="Score System ('/' seperated):", title="Scores")
+        dialog2 = customtkinter.CTkInputDialog(text="Score System ( '/' seperated):", title="Scores")
         scores=list(map(int,dialog2.get_input().split("/")))
-        dialog3 = customtkinter.CTkInputDialog(text="Initial Team Scores (',' seperated):", title="Initial Scores")
-        ini_scores=list(map(int,dialog3.get_input().split(",")))
+        dialog3 = customtkinter.CTkInputDialog(text="Initial Team Scores ( ',' seperated)\n Leave Blank for all Zero:", title="Initial Scores")
+        ini_scores=dialog3.get_input().split(",")
         detBtn.place_forget()
         #Remapping to finally create and place elements on Round's Frame
         set_round(no_teams,scores,ini_scores)
@@ -86,7 +97,11 @@ def add_rounds(event=None):
 #Elements
 sidebar_frame = customtkinter.CTkFrame(app)
 sidebar_subframe=customtkinter.CTkFrame(sidebar_frame)
+scores_frame=customtkinter.CTkFrame(app,height=50,width=width*.8)
 rounds_frame=customtkinter.CTkFrame(app,width=width*.8)
+scores_label=customtkinter.CTkLabel(scores_frame,text="Saved Scores: ")
+scores_button=customtkinter.CTkButton(scores_frame,text="Save",width=width*.02)
+scores_textbox=customtkinter.CTkEntry(scores_frame,width=width*.47)
 sidebar_label=customtkinter.CTkLabel(sidebar_subframe,text="Enter No of Rounds:")
 sidebar_textbox=customtkinter.CTkEntry(sidebar_subframe,width=width*.04)
 sidebar_textbox.bind("<Return>",add_rounds)
@@ -97,5 +112,9 @@ sidebar_subframe.pack(pady=2,padx=2,ipadx=15,ipady=5)
 sidebar_label.pack(pady=10)
 sidebar_textbox.pack(side='left')
 sidebar_button.pack(side='right')
+scores_frame.pack(fill='y',padx=20,pady=20)
+scores_label.place(relx=0.05,rely=0.5, anchor=tkinter.CENTER)
+scores_button.place(relx=.97,rely=0.5, anchor=tkinter.CENTER)
+scores_textbox.place(relx=0.52,rely=0.5, anchor=tkinter.CENTER)
 #MainLoop
 app.mainloop()
