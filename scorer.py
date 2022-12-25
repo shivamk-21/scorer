@@ -11,8 +11,12 @@ customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("blue")
 #Varibales
 rounds=[]
+scores=[]
 #Functions
 def round(n):
+    if rounds_frame.winfo_ismapped():
+        rounds_frame.forget()
+    rounds_frame.pack(side='right',fill='both',padx=20,pady=20)
     print(n)
 def add_rounds(event=None):
     for x in sidebar_frame.winfo_children()[1:]:
@@ -23,17 +27,18 @@ def add_rounds(event=None):
     for x in range(n):
         rounds[x].pack(pady=5)
 #Elements
-sidebar_frame = customtkinter.CTkFrame(app,corner_radius=0)
-sidebar_subframe=customtkinter.CTkFrame(sidebar_frame,corner_radius=0)
+sidebar_frame = customtkinter.CTkFrame(app)
+sidebar_subframe=customtkinter.CTkFrame(sidebar_frame)
 sidebar_label=customtkinter.CTkLabel(sidebar_subframe,text="Enter No of Rounds:")
 sidebar_textbox=customtkinter.CTkEntry(sidebar_subframe,width=width*.04)
 sidebar_textbox.bind("<Return>",add_rounds)
 sidebar_button=customtkinter.CTkButton(sidebar_subframe,text="Go",width=width*.02,command=add_rounds)
+rounds_frame=customtkinter.CTkFrame(app,width=width*.8)
 #Packing/Griding
-sidebar_frame.pack(side="left",fill="y")
-sidebar_subframe.pack()
-sidebar_label.grid(row=0,column=0,columnspan=2,ipady=5)
-sidebar_textbox.grid(row=1,column=0)
-sidebar_button.grid(row=1,column=1)
+sidebar_frame.pack(side="left",fill="y",padx=10,pady=10,ipadx=5)
+sidebar_subframe.pack(pady=2,padx=2,ipadx=15,ipady=5)
+sidebar_label.pack(pady=10)
+sidebar_textbox.pack(side='left')
+sidebar_button.pack(side='right')
 #MainLoop
 app.mainloop()
