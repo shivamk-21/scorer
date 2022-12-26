@@ -1,5 +1,5 @@
 #Imports
-import customtkinter,tkinter
+import customtkinter,tkinter,os,sys
 from functools import partial
 #App Definition
 app = customtkinter.CTk()
@@ -9,9 +9,6 @@ width=app.winfo_width()
 height=app.winfo_height()
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("blue")
-#Icon
-p1 = tkinter.PhotoImage(file = 'inquizitive.png')
-app.iconphoto(False, p1)
 #Functions
 #Function to Save the scores in upper Tab
 def save_master(score):
