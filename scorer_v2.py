@@ -13,24 +13,12 @@ class Scorer(customtkinter.CTk):
         self.title("Inquizitive_Scoring_App")
         self.w=self.winfo_width()
         self.h=self.winfo_height()
-        self.Toplevel()  #Calling TopLevel to take Inputs
-    #Function to print all Inputs
-    def run(self):
-        self.window.destroy()
-        for x in range(len(self.detBtns)):
-            self.detBtns[x]=self.detBtns[x][1:]
-        self.setup()
-    #Function to change Appearance
-    def change_appearance_mode_event(self,new_appearance_mode):
-            customtkinter.set_appearance_mode(new_appearance_mode)
-    #Function to change Scaling
-    def change_scaling_event(self,new_scaling):
-            new_scaling_float = int(new_scaling.replace("%", "")) / 100
-            customtkinter.set_widget_scaling(new_scaling_float)
-    def setup(self):
+        #MAin App Elements
         sidebar_frame = customtkinter.CTkFrame(self)
+        self.sidebar_subframe2=customtkinter.CTkFrame(sidebar_frame)
         sidebar_subframe3=customtkinter.CTkFrame(sidebar_frame)
-        self.rounds_frame=customtkinter.CTkFrame(app,width=self.w*.8)
+        self.rounds_frame=customtkinter.CTkFrame(self,width=self.w*.8)
+        self.main_button=customtkinter.CTkButton(sidebar_subframe3,text="Start",command=self.Toplevel)
         appearance_mode_label = customtkinter.CTkLabel(sidebar_subframe3, text="Appearance Mode:", anchor="w")
         appearance_mode_optionemenu = customtkinter.CTkOptionMenu(sidebar_subframe3, values=["Dark", "Light", "System"],
                                                                         command=self.change_appearance_mode_event)
@@ -38,8 +26,6 @@ class Scorer(customtkinter.CTk):
         scaling_optionemenu = customtkinter.CTkOptionMenu(sidebar_subframe3, values=["50%","60%","80%", "90%", "100%", "110%", "120%"],
                                                                     command=self.change_scaling_event)
         scaling_optionemenu.set("100%")
-        for x in range(self.n):
-            customtkinter.CTkButton(sidebar_frame,text="Round "+str(x+1)).pack(padx=10,pady=10)
         #Packing/Griding
         sidebar_frame.pack(side="left",fill="y",padx=10,pady=10,ipadx=5)
         sidebar_subframe3.pack(side='bottom',pady=5,padx=5,ipadx=10)
@@ -47,12 +33,36 @@ class Scorer(customtkinter.CTk):
         scaling_label.pack(side='bottom')
         appearance_mode_optionemenu.pack(side='bottom')
         appearance_mode_label.pack(side='bottom')
+        self.main_button.pack(side='bottom')
+    #Function to print all Inputs
+    def setup(self):
+        #Closing TopLevel Window
+        self.window.destroy()
+        for x in range(len(self.detBtns)):
+            self.detBtns[x]=self.detBtns[x][1:]
+        #Changing Main button text to Restart
+        self.main_button.configure(text="Restart")
+        #Packing when required
+        self.sidebar_subframe2.pack(pady=5,padx=5,ipadx=10)
+        #Destroying previous elements
+        for x in self.sidebar_subframe2.winfo_children():
+            x.destroy()
+        #Adding Round BUttons
+        for x in range(self.n):
+            customtkinter.CTkButton(self.sidebar_subframe2,text="Round "+str(x+1)).pack(padx=10,pady=10)
+    #Function to change Appearance
+    def change_appearance_mode_event(self,new_appearance_mode):
+            customtkinter.set_appearance_mode(new_appearance_mode)
+    #Function to change Scaling
+    def change_scaling_event(self,new_scaling):
+            new_scaling_float = int(new_scaling.replace("%", "")) / 100
+            customtkinter.set_widget_scaling(new_scaling_float)
     #Function that creates TopLevel Window
     def Toplevel(self):
         self.window =customtkinter.CTkToplevel(self)
         self.window.geometry(str(self.w//2)+"x"+str(self.h//2))
         self.window.title("Set Quiz Details")
-        self.window.protocol("WM_DELETE_WINDOW", self.run)
+        self.window.protocol("WM_DELETE_WINDOW", self.setup)
         #TopLevel Window ELements
         label=customtkinter.CTkLabel(self.window,text="Enter No of Rounds:")
         self.textbox=customtkinter.CTkEntry(self.window)  #Declaring self as may be reuired later
