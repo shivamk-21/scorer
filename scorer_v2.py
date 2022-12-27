@@ -13,7 +13,7 @@ class Scorer(customtkinter.CTk):
         self.title("Inquizitive_Scoring_App")
         self.w=self.winfo_width()
         self.h=self.winfo_height()
-        #MAin App Elements
+        #Main App Elements
         sidebar_frame = customtkinter.CTkFrame(self)
         scores_frame=customtkinter.CTkFrame(self,height=50,width=self.w*.8)
         self.sidebar_subframe2=customtkinter.CTkFrame(sidebar_frame)
@@ -33,13 +33,13 @@ class Scorer(customtkinter.CTk):
         sidebar_frame.pack(side="left",fill="y",padx=10,pady=10,ipadx=5)
         sidebar_subframe3.pack(side='bottom',pady=5,padx=5,ipadx=10)
         scores_frame.pack(fill='y',padx=20,pady=20)
-        scaling_optionemenu.pack(side='bottom')
+        scaling_optionemenu.pack(side='bottom',padx=10,pady=10)
         scaling_label.pack(side='bottom')
         appearance_mode_optionemenu.pack(side='bottom')
         appearance_mode_label.pack(side='bottom')
-        self.main_button.pack(side='bottom')
-        scores_label.place(relx=0.05,rely=0.5, anchor=tkinter.CENTER)
-        self.scores_textbox.place(relx=0.52,rely=0.5, anchor=tkinter.CENTER)
+        self.main_button.pack(side='bottom',padx=10,pady=10)
+        scores_label.place(relx=0.07,rely=0.5, anchor=tkinter.CENTER)
+        self.scores_textbox.place(relx=0.55,rely=0.5, anchor=tkinter.CENTER)
     def add_points(self,x,val):
         self.team_scores[x]+=val
         self.scoreTab.configure(state="normal")
@@ -87,9 +87,9 @@ class Scorer(customtkinter.CTk):
         self.segment_buttons=[]
         for team in range(self.detBtns[round_no][0]):
             self.segment_buttons.append(customtkinter.CTkSegmentedButton(self.rounds_frame,values=self.detBtns[round_no][1],command=partial(self.add_points,team)))
-            self.segment_buttons[team].place(relx=0.6, rely=.05+(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
+            self.segment_buttons[team].place(relx=0.6, rely=(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
             #Label for each Segment Button
-            customtkinter.CTkLabel(self.rounds_frame,text="Team "+str(team+1)).place(relx=0.4, rely=.05+(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
+            customtkinter.CTkLabel(self.rounds_frame,text="Team "+str(team+1)).place(relx=0.4, rely=(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
         self.add_points(0,0)
     #Function to print all Inputs
     def setup(self):
@@ -117,7 +117,7 @@ class Scorer(customtkinter.CTk):
     #Function that creates TopLevel Window
     def Toplevel(self):
         self.window =customtkinter.CTkToplevel(self)
-        self.window.geometry(str(self.w//2)+"x"+str(self.h//2))
+        self.window.geometry(str(self.w//2)+"x"+str(self.h//2)+"+"+str(self.w)+"x"+str(self.h))
         self.window.title("Set Quiz Details")
         self.window.protocol("WM_DELETE_WINDOW", self.setup)
         #TopLevel Window ELements
@@ -129,6 +129,8 @@ class Scorer(customtkinter.CTk):
         label.place(relx=0.3,rely=0.05)
         self.textbox.place(relx=0.5,rely=0.05,width=self.w*.04)
         button.place(relx=0.6,rely=0.05)
+        if self.rounds_frame.winfo_ismapped():
+            self.rounds_frame.forget()
     #Function that adds rounds and corresponding buttons to add details in self.window
     def add_rounds(self,event=None):
         #Overriding previous rounds if any
@@ -141,8 +143,8 @@ class Scorer(customtkinter.CTk):
         #Creating self.detBtns as it will store future data as well
         self.detBtns =[customtkinter.CTkButton(self.window,text="Add Round Details", command=partial(self.details,x)) for x in range(self.n)]
         for x in range(self.n):
-            rounds[x].place(relx=0.2,rely=0.1+(x+1)*.8/(self.n),anchor=tkinter.CENTER)
-            self.detBtns[x].place(relx=0.5, rely=0.1+(x+1)*.8/(self.n),anchor=tkinter.CENTER)
+            rounds[x].place(relx=0.3,rely=0.1+(x+1)*.8/(self.n),anchor=tkinter.CENTER)
+            self.detBtns[x].place(relx=0.6, rely=0.1+(x+1)*.8/(self.n),anchor=tkinter.CENTER)
     #Function that is linked to buttons to take each round inputs
     def details(self,x):
         #If it is first round then take the number of initial teams
