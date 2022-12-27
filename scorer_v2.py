@@ -13,13 +13,40 @@ class Scorer(customtkinter.CTk):
         self.title("Inquizitive_Scoring_App")
         self.w=self.winfo_width()
         self.h=self.winfo_height()
-        self.Toplevel()  #Callinf TopLevel to take Inputs
+        self.Toplevel()  #Calling TopLevel to take Inputs
     #Function to print all Inputs
     def run(self):
         self.window.destroy()
         for x in range(len(self.detBtns)):
             self.detBtns[x]=self.detBtns[x][1:]
-            print(self.detBtns[x])
+        self.setup()
+    #Function to change Appearance
+    def change_appearance_mode_event(self,new_appearance_mode):
+            customtkinter.set_appearance_mode(new_appearance_mode)
+    #Function to change Scaling
+    def change_scaling_event(self,new_scaling):
+            new_scaling_float = int(new_scaling.replace("%", "")) / 100
+            customtkinter.set_widget_scaling(new_scaling_float)
+    def setup(self):
+        sidebar_frame = customtkinter.CTkFrame(self)
+        sidebar_subframe3=customtkinter.CTkFrame(sidebar_frame)
+        self.rounds_frame=customtkinter.CTkFrame(app,width=self.w*.8)
+        appearance_mode_label = customtkinter.CTkLabel(sidebar_subframe3, text="Appearance Mode:", anchor="w")
+        appearance_mode_optionemenu = customtkinter.CTkOptionMenu(sidebar_subframe3, values=["Dark", "Light", "System"],
+                                                                        command=self.change_appearance_mode_event)
+        scaling_label = customtkinter.CTkLabel(sidebar_subframe3, text="UI Scaling:", anchor="w")
+        scaling_optionemenu = customtkinter.CTkOptionMenu(sidebar_subframe3, values=["50%","60%","80%", "90%", "100%", "110%", "120%"],
+                                                                    command=self.change_scaling_event)
+        scaling_optionemenu.set("100%")
+        for x in range(self.n):
+            customtkinter.CTkButton(sidebar_frame,text="Round "+str(x+1)).pack(padx=10,pady=10)
+        #Packing/Griding
+        sidebar_frame.pack(side="left",fill="y",padx=10,pady=10,ipadx=5)
+        sidebar_subframe3.pack(side='bottom',pady=5,padx=5,ipadx=10)
+        scaling_optionemenu.pack(side='bottom')
+        scaling_label.pack(side='bottom')
+        appearance_mode_optionemenu.pack(side='bottom')
+        appearance_mode_label.pack(side='bottom')
     #Function that creates TopLevel Window
     def Toplevel(self):
         self.window =customtkinter.CTkToplevel(self)
@@ -67,7 +94,7 @@ class Scorer(customtkinter.CTk):
         #Also adding relevant round detials in the self.detBtns
         self.detBtns[x].place_forget()
         self.detBtns[x]=[customtkinter.CTkLabel(self.window,
-            text="Number of teams="+str(no_teams)+"Scores for this round="+str(scores)+" Qualifying Teams="+str(no_q_teams))
+            text="Number of teams="+str(no_teams)+"  Scores for this round="+str(scores)+"  Qualifying Teams="+str(no_q_teams))
             ,no_teams,scores,no_q_teams]
         self.detBtns[x][0].place(relx=0.6, rely=0.1+(x+1)*.8/(self.n),anchor=tkinter.CENTER)
 
