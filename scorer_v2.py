@@ -15,6 +15,7 @@ class Scorer(customtkinter.CTk):
         self.h=self.winfo_height()
         #MAin App Elements
         sidebar_frame = customtkinter.CTkFrame(self)
+        scores_frame=customtkinter.CTkFrame(self,height=50,width=self.w*.8)
         self.sidebar_subframe2=customtkinter.CTkFrame(sidebar_frame)
         sidebar_subframe3=customtkinter.CTkFrame(sidebar_frame)
         self.rounds_frame=customtkinter.CTkFrame(self,width=self.w*.8)
@@ -26,14 +27,19 @@ class Scorer(customtkinter.CTk):
         scaling_optionemenu = customtkinter.CTkOptionMenu(sidebar_subframe3, values=["50%","60%","80%", "90%", "100%", "110%", "120%"],
                                                                     command=self.change_scaling_event)
         scaling_optionemenu.set("100%")
+        scores_label=customtkinter.CTkLabel(scores_frame,text="Last Round Scores: ")
+        self.scores_textbox=customtkinter.CTkEntry(scores_frame,width=self.w*.45,state='readonly')
         #Packing/Griding
         sidebar_frame.pack(side="left",fill="y",padx=10,pady=10,ipadx=5)
         sidebar_subframe3.pack(side='bottom',pady=5,padx=5,ipadx=10)
+        scores_frame.pack(fill='y',padx=20,pady=20)
         scaling_optionemenu.pack(side='bottom')
         scaling_label.pack(side='bottom')
         appearance_mode_optionemenu.pack(side='bottom')
         appearance_mode_label.pack(side='bottom')
         self.main_button.pack(side='bottom')
+        scores_label.place(relx=0.05,rely=0.5, anchor=tkinter.CENTER)
+        self.scores_textbox.place(relx=0.52,rely=0.5, anchor=tkinter.CENTER)
     def add_points(self,x,val):
         self.team_scores[x]+=val
         self.scoreTab.configure(state="normal")
@@ -46,6 +52,11 @@ class Scorer(customtkinter.CTk):
         if round_no==0:
             self.team_scores=[0]*self.detBtns[round_no][0]
         else:
+            s=" ".join(["Team "+str(x+1)+" : "+str(self.team_scores[x]) for x in range(len(self.team_scores))])
+            self.scores_textbox.configure(state="normal")
+            self.scores_textbox.delete(0,'end')
+            self.scores_textbox.insert(0,s)
+            self.scores_textbox.configure(state="readonly")
             self.team_scores.sort()
             self.team_scores.reverse()
             self.team_scores=self.team_scores[:self.detBtns[round_no][0]]
