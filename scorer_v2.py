@@ -40,80 +40,6 @@ class Scorer(customtkinter.CTk):
         self.main_button.pack(side='bottom',padx=10,pady=10)
         scores_label.place(relx=0.07,rely=0.5, anchor=tkinter.CENTER)
         self.scores_textbox.place(relx=0.55,rely=0.5, anchor=tkinter.CENTER)
-    def add_points(self,x,val):
-        self.team_scores[x]+=val
-        self.scoreTab.configure(state="normal")
-        s=" ".join(["Team "+str(x+1)+" : "+str(self.team_scores[x]) for x in range(len(self.team_scores))])
-        self.scoreTab.delete(0,'end')
-        self.scoreTab.insert(0,s)
-        self.scoreTab.configure(state="readonly")
-        self.segment_buttons[x].set("unset")
-    def round(self,round_no):
-        if round_no==0:
-            self.team_scores=[0]*self.detBtns[round_no][0]
-        else:
-            s=" ".join(["Team "+str(x+1)+" : "+str(self.team_scores[x]) for x in range(len(self.team_scores))])
-            self.scores_textbox.configure(state="normal")
-            self.scores_textbox.delete(0,'end')
-            self.scores_textbox.insert(0,s)
-            self.scores_textbox.configure(state="readonly")
-            self.team_scores.sort()
-            self.team_scores.reverse()
-            self.team_scores=self.team_scores[:self.detBtns[round_no][0]]
-            if self.team_scores.count(self.team_scores[-1])!=1:
-                tkinter.messagebox.showwarning("Warning","A Tie has occured")
-        if self.rounds_frame.winfo_ismapped():
-            self.rounds_frame.forget()
-        for x in self.rounds_frame.winfo_children():
-            x.place_forget()
-        #Packing an empty Rounds Frame 
-        self.rounds_frame.pack(side='right',fill='both',padx=20,pady=20)
-        #ScoreTab and Switch elements
-        #Subfunction which add functionality to Switch 
-        switch_var = customtkinter.StringVar(value="on") #Variable for the Switch
-        def switch_event():
-            if switch_var.get()=="off":
-                self.scoreTab.configure(state="normal")
-            else:
-                s=self.scoreTab.get().split(":")
-                s=[int(x.split()[0]) for x in s[1:]]
-                for x in range(len(s)):
-                    self.team_scores[x]=s[x]
-                self.scoreTab.configure(state="readonly")
-        self.scoreTab=customtkinter.CTkEntry(self.rounds_frame,state='readonly',width=self.w*.4)
-        self.scoreTab.place(relx=0.4,rely=.95,anchor=tkinter.CENTER)
-        switch = customtkinter.CTkSwitch(self.rounds_frame, text="Admin LOCK", command=switch_event,variable=switch_var, onvalue="on", offvalue="off")
-        switch.place(relx=0.9,rely=.95,anchor=tkinter.CENTER)
-        self.segment_buttons=[]
-        for team in range(self.detBtns[round_no][0]):
-            self.segment_buttons.append(customtkinter.CTkSegmentedButton(self.rounds_frame,values=self.detBtns[round_no][1],command=partial(self.add_points,team)))
-            self.segment_buttons[team].place(relx=0.6, rely=(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
-            #Label for each Segment Button
-            customtkinter.CTkLabel(self.rounds_frame,text="Team "+str(team+1)).place(relx=0.4, rely=(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
-        self.add_points(0,0)
-    #Function to print all Inputs
-    def setup(self):
-        #Closing TopLevel Window
-        self.window.destroy()
-        for x in range(len(self.detBtns)):
-            self.detBtns[x]=self.detBtns[x][1:]
-        #Changing Main button text to Restart
-        self.main_button.configure(text="Restart")
-        #Packing when required
-        self.sidebar_subframe2.pack(pady=5,padx=5,ipadx=10)
-        #Destroying previous elements
-        for x in self.sidebar_subframe2.winfo_children():
-            x.destroy()
-        #Adding Round BUttons
-        for x in range(self.n):
-            customtkinter.CTkButton(self.sidebar_subframe2,text="Round "+str(x+1),command=partial(self.round,x)).pack(padx=10,pady=10)
-    #Function to change Appearance
-    def change_appearance_mode_event(self,new_appearance_mode):
-            customtkinter.set_appearance_mode(new_appearance_mode)
-    #Function to change Scaling
-    def change_scaling_event(self,new_scaling):
-            new_scaling_float = int(new_scaling.replace("%", "")) / 100
-            customtkinter.set_widget_scaling(new_scaling_float)
     #Function that creates TopLevel Window
     def Toplevel(self):
         self.window =customtkinter.CTkToplevel(self)
@@ -166,6 +92,87 @@ class Scorer(customtkinter.CTk):
             text="Number of teams="+str(no_teams)+"  Scores for this round="+str(scores)+"  Qualifying Teams="+str(no_q_teams))
             ,no_teams,scores,no_q_teams]
         self.detBtns[x][0].place(relx=0.6, rely=0.1+(x+1)*.8/(self.n),anchor=tkinter.CENTER)
+    #Function adding points 
+    def add_points(self,x,val):
+        self.team_scores[x]+=val
+        self.scoreTab.configure(state="normal")
+        s=" ".join(["Team "+str(x+1)+" : "+str(self.team_scores[x]) for x in range(len(self.team_scores))])
+        self.scoreTab.delete(0,'end')
+        self.scoreTab.insert(0,s)
+        self.scoreTab.configure(state="readonly")
+        self.segment_buttons[x].set("unset")
+    #FUnction creating the layout round
+    def round(self,round_no):
+        #Initailising if team_scores do not exist
+        if round_no==0:
+            self.team_scores=[0]*self.detBtns[round_no][0]
+        #Selecting top teams from last round
+        else:
+            s=" ".join(["Team "+str(x+1)+" : "+str(self.team_scores[x]) for x in range(len(self.team_scores))])
+            self.scores_textbox.configure(state="normal")
+            self.scores_textbox.delete(0,'end')
+            self.scores_textbox.insert(0,s)
+            self.scores_textbox.configure(state="readonly")
+            self.team_scores.sort()
+            self.team_scores.reverse()
+            self.team_scores=self.team_scores[:self.detBtns[round_no][0]]
+            if self.team_scores.count(self.team_scores[-1])!=1:
+                tkinter.messagebox.showwarning("Warning","A Tie has occured")
+        #Removing layout of last round if any
+        if self.rounds_frame.winfo_ismapped():
+            self.rounds_frame.forget()
+        for x in self.rounds_frame.winfo_children():
+            x.place_forget()
+        #Packing an empty Rounds Frame 
+        self.rounds_frame.pack(side='right',fill='both',padx=20,pady=20)
+        #Subfunction which add functionality to Switch 
+        switch_var = customtkinter.StringVar(value="on") #Variable for the Switch
+        def switch_event():
+            if switch_var.get()=="off":
+                self.scoreTab.configure(state="normal")
+            else:
+                s=self.scoreTab.get().split(":")
+                s=[int(x.split()[0]) for x in s[1:]]
+                for x in range(len(s)):
+                    self.team_scores[x]=s[x]
+                self.scoreTab.configure(state="readonly")
+        #ScoreTab and Switch elements
+        self.scoreTab=customtkinter.CTkEntry(self.rounds_frame,state='readonly',width=self.w*.4)
+        self.scoreTab.place(relx=0.4,rely=.95,anchor=tkinter.CENTER)
+        switch = customtkinter.CTkSwitch(self.rounds_frame, text="Admin LOCK", command=switch_event,variable=switch_var, onvalue="on", offvalue="off")
+        switch.place(relx=0.9,rely=.95,anchor=tkinter.CENTER)
+        #Segment Button for adding scores | Linked with add_points
+        self.segment_buttons=[]
+        for team in range(self.detBtns[round_no][0]):
+            self.segment_buttons.append(customtkinter.CTkSegmentedButton(self.rounds_frame,values=self.detBtns[round_no][1],command=partial(self.add_points,team)))
+            self.segment_buttons[team].place(relx=0.6, rely=(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
+            #Label for each Segment Button
+            customtkinter.CTkLabel(self.rounds_frame,text="Team "+str(team+1)).place(relx=0.4, rely=(team+1)*.8/self.detBtns[round_no][0], anchor=tkinter.CENTER)
+        self.add_points(0,0)
+    #Function to print all Inputs
+    def setup(self):
+        #Closing TopLevel Window
+        self.window.destroy()
+        for x in range(len(self.detBtns)):
+            self.detBtns[x]=self.detBtns[x][1:]
+        #Changing Main button text to Restart
+        self.main_button.configure(text="Restart")
+        #Packing when required
+        self.sidebar_subframe2.pack(pady=5,padx=5,ipadx=10)
+        #Destroying previous elements
+        for x in self.sidebar_subframe2.winfo_children():
+            x.destroy()
+        #Adding Round BUttons
+        for x in range(self.n):
+            customtkinter.CTkButton(self.sidebar_subframe2,text="Round "+str(x+1),command=partial(self.round,x)).pack(padx=10,pady=10)
+    #Function to change Appearance
+    def change_appearance_mode_event(self,new_appearance_mode):
+            customtkinter.set_appearance_mode(new_appearance_mode)
+    #Function to change Scaling
+    def change_scaling_event(self,new_scaling):
+            new_scaling_float = int(new_scaling.replace("%", "")) / 100
+            customtkinter.set_widget_scaling(new_scaling_float)
+    
 #App Object
 app=Scorer()  
 #MainLoop
