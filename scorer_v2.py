@@ -1,5 +1,5 @@
 #Imports
-import customtkinter,tkinter
+import customtkinter,tkinter,pymongo
 from functools import partial
 #Setting App Appreance
 customtkinter.set_appearance_mode("System")
@@ -29,6 +29,8 @@ class Scorer(customtkinter.CTk):
         scaling_optionemenu.set("100%")
         scores_label=customtkinter.CTkLabel(scores_frame,text="Last Round Scores: ")
         self.scores_textbox=customtkinter.CTkEntry(scores_frame,width=self.w*.45,state='readonly')
+        self.db_var = customtkinter.StringVar(value="off") #Variable for the DB Switch
+        db_switch = customtkinter.CTkSwitch(sidebar_subframe3, text="Companion Mode", command=self.mongo_connect,variable=self.db_var, onvalue="on", offvalue="off")
         #Packing/Griding
         sidebar_frame.pack(side="left",fill="y",padx=10,pady=10,ipadx=5)
         sidebar_subframe3.pack(side='bottom',pady=5,padx=5,ipadx=10)
@@ -37,9 +39,14 @@ class Scorer(customtkinter.CTk):
         scaling_label.pack(side='bottom')
         appearance_mode_optionemenu.pack(side='bottom')
         appearance_mode_label.pack(side='bottom')
+        db_switch.pack(side='bottom',padx=10,pady=10)
         self.main_button.pack(side='bottom',padx=10,pady=10)
         scores_label.place(relx=0.07,rely=0.5, anchor=tkinter.CENTER)
         self.scores_textbox.place(relx=0.55,rely=0.5, anchor=tkinter.CENTER)
+    def mongo_connect(self):
+        CONNECTION_STRING = "mongodb+srv://directory:YruWyFSkBITXeD0J@cluster0.wxp8qsb.mongodb.net/?retryWrites=true&w=majority"
+        client = pymongo.MongoClient(CONNECTION_STRING)
+        self.db = client.scorer
     #Function that creates TopLevel Window
     def Toplevel(self):
         self.window =customtkinter.CTkToplevel(self)
@@ -101,6 +108,8 @@ class Scorer(customtkinter.CTk):
         self.scoreTab.insert(0,s)
         self.scoreTab.configure(state="readonly")
         self.segment_buttons[x].set("unset")
+        if self.db_var.get()=="on":
+            self.db.scores.update_one({"_id":1}, {"$set": {"_id":1,"score":self.team_scores}}, upsert=True)
     #FUnction creating the layout round
     def round(self,round_no):
         #Initailising if team_scores do not exist
